@@ -1,0 +1,12 @@
+{
+  "name": "foo-linked-package-name-2",
+  "version": "1.0.0",
+  "dependencies": {
+    "foo-package-1-name-2": "file:../foo-package-1"
+  },
+  "npm-file-link": {
+    "original_versions": {
+      "foo-package-1-name-2": "1.0.0"
+    }
+  }
+}

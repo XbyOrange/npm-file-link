@@ -1,0 +1,12 @@
+{
+  "name": "foo-package-1-name-2",
+  "version": "1.0.0",
+  "dependencies": {
+    "foo-1": "1.0.0",
+    "foo-package-2-name": "2.0.0"
+  },
+  "devDependencies": {
+    "foo-package-3-name": "2.0.0",
+    "foo-4": "4.0.0"
+  }
+}

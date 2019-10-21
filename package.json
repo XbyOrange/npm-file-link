@@ -1,0 +1,68 @@
+{
+  "name": "@xbyorange/npm-file-link",
+  "version": "1.0.0",
+  "description": "CLI for linking npm repositories locally using \"file:\" method",
+  "keywords": [
+    "cli",
+    "npm",
+    "link",
+    "file",
+    "tool",
+    "development",
+    "local"
+  ],
+  "author": "XbyOrange",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/xbyorange/npm-file-link",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "bin",
+    "src",
+    "index.js"
+  ],
+  "main": "index.js",
+  "bin": {
+    "file-link": "./bin/file-link",
+    "file-unlink": "./bin/file-unlink",
+    "file-link-all": "./bin/file-link-all",
+    "file-unlink-all": "./bin/file-unlink-all",
+    "avoid-file-links": "./bin/avoid-file-links"
+  },
+  "scripts": {
+    "avoid-file-links": "cross-env ./bin/avoid-file-links",
+    "lint": "eslint src test",
+    "lint-staged": "lint-staged",
+    "test": "jest",
+    "test-ci": "npm run test -- --coverage --ci --verbose=false --coverageReporters=lcov --coverageReporters=text-summary"
+  },
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "fs-extra": "^7.0.1",
+    "globule": "^1.2.1",
+    "lodash": "^4.17.11",
+    "inquirer": "^6.2.2"
+  },
+  "devDependencies": {
+    "coveralls": "^3.0.7",
+    "cross-env": "^5.2.0",
+    "eslint": "6.5.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "husky": "3.0.9",
+    "jest": "24.9.0",
+    "lint-staged": "9.4.2",
+    "prettier": "^1.18.2",
+    "sinon": "^7.2.3"
+  },
+  "lint-staged": {
+    "src/**/*.js": "eslint",
+    "test/**/*.js": "eslint"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint-staged && npm run avoid-file-links"
+    }
+  }
+}
