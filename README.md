@@ -70,37 +70,17 @@ To avoid pushing local links to the remote repository, this package provides a `
 avoid-file-links
 ```
 
-Here are the steps to configure the precommit command in all packages that may be locally linked:
+### Support (OS Terminals)
 
-```bash
-npm i --save-dev @xbyorange/npm-file-link husky
-```
-
-Add next scripts and [husky](https://www.npmjs.com/package/husky) configuration to the `package.json` file:
-
-```json
-{
-  "scripts": {
-    "avoid-file-links": "avoid-file-links"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run avoid-file-links"
-    }
-  }
-}
-```
-
-Now, when trying to push any change that includes a local link in the `package.json` or `package-lock.json` files, the user will receive an error like:
-
-```bash
-ERROR: Please remove file links. Run "file-unlink-all".
-```
+npm-file-link uses [inquirer][inquirer-url] for displaying CLI. You can [consult his OS Terminals support here][inquirer-support].
 
 ## Contributing
 
 Contributors are welcome.
 Please read the [contributing guidelines](.github/CONTRIBUTING.md) and [code of conduct](.github/CODE_OF_CONDUCT.md).
+
+[inquirer-url]: https://www.npmjs.com/package/inquirer#support-os-terminals
+[inquirer-support]: https://www.npmjs.com/package/inquirer#support-os-terminals
 
 [coveralls-image]: https://coveralls.io/repos/github/XbyOrange/npm-file-link/badge.svg
 [coveralls-url]: https://coveralls.io/github/XbyOrange/npm-file-link
