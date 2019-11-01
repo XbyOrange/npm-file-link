@@ -24,21 +24,17 @@
   ],
   "main": "index.js",
   "bin": {
-    "file-link": "./bin/file-link",
-    "file-unlink": "./bin/file-unlink",
-    "file-link-all": "./bin/file-link-all",
-    "file-unlink-all": "./bin/file-unlink-all",
-    "avoid-file-links": "./bin/avoid-file-links"
+    "npm-file-link": "./bin/npm-file-link"
   },
   "scripts": {
-    "avoid-file-links": "cross-env ./bin/avoid-file-links",
+    "avoid-file-links": "cross-env ./bin/npm-file-link --check",
     "lint": "eslint src test",
     "lint-staged": "lint-staged",
     "test": "jest",
     "coveralls": "cat ./.coverage/lcov.info | coveralls"
   },
   "dependencies": {
-    "chalk": "^2.4.2",
+    "chalk": "3.0.0-beta.2",
     "fs-extra": "^7.0.1",
     "globule": "^1.2.1",
     "lodash": "^4.17.15",

@@ -4,9 +4,14 @@ const path = require("path");
 const fsExtra = require("fs-extra");
 const globule = require("globule");
 
+const { isFileDependency } = require("./helpers");
 const paths = require("./paths");
 
-const readPackageJson = packageJsonPath => fsExtra.readJson(packageJsonPath);
+const readPackageJson = packageJsonPath =>
+  fsExtra.readJson(packageJsonPath).catch(() => {
+    return Promise.reject(new Error(`Unable to read ${packageJsonPath}`));
+  });
+
 const writePackageJson = (packageJsonFolder, content) =>
   paths.getWorkingPath().then(workingPath =>
     fsExtra.writeJson(path.resolve(workingPath, packageJsonFolder, paths.PACKAGE_JSON), content, {
@@ -49,6 +54,21 @@ const readAll = () => {
   });
 };
 
+const filterLinkablePackages = (packageInfo, allPackages) => {
+  const linkablePackages = {};
+  Object.keys(allPackages).forEach(packageName => {
+    const dependency =
+      packageInfo.dependencies[packageName] || packageInfo.devDependencies[packageName];
+    if (dependency) {
+      linkablePackages[packageName] = { ...allPackages[packageName] };
+      if (isFileDependency(dependency)) {
+        linkablePackages[packageName].isLinked = true;
+      }
+    }
+  });
+  return linkablePackages;
+};
+
 const readCurrent = () => {
   const packageJsonPath = path.resolve(process.cwd(), paths.PACKAGE_JSON);
   const folder = process
@@ -65,8 +85,16 @@ const readCurrent = () => {
   });
 };
 
+const currentLinkablePackages = currentPackageInfo => {
+  return readAll().then(allPackagesInfo => {
+    return Promise.resolve(filterLinkablePackages(currentPackageInfo, allPackagesInfo));
+  });
+};
+
 module.exports = {
   readAll,
   readCurrent,
-  writePackageJson
+  writePackageJson,
+  filterLinkablePackages,
+  currentLinkablePackages
 };

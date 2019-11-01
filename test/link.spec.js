@@ -27,45 +27,11 @@ describe("link", () => {
       })
     );
 
-    sandbox.stub(npm, "install").resolves();
+    sandbox.stub(npm, "checkChangesAndInstall").resolves();
   });
 
   afterEach(() => {
     sandbox.restore();
-  });
-
-  describe("all method", () => {
-    it("should modify all inter dependencies of found packages", async () => {
-      expect.assertions(4);
-      await link.all();
-
-      expect(writeStub.getCall(2).args[0]).toEqual("foo-package-1");
-      expect(writeStub.getCall(2).args[1]).toEqual({
-        name: "foo-package-1-name",
-        version: "1.0.0",
-        dependencies: { "foo-1": "1.0.0", "foo-package-2-name": "file:../foo-package-2" },
-        devDependencies: { "foo-package-3-name": "file:../foo-package-3", "foo-4": "4.0.0" },
-        "npm-file-link": {
-          original_versions: {
-            "foo-package-2-name": "2.0.0",
-            "foo-package-3-name": "2.0.0"
-          }
-        }
-      });
-
-      expect(writeStub.getCall(3).args[0]).toEqual("foo-package-2");
-      expect(writeStub.getCall(3).args[1]).toEqual({
-        name: "foo-package-2-name",
-        version: "2.0.0",
-        dependencies: { "foo-1": "1.0.0", "foo-package-3-name": "file:../foo-package-3" },
-        devDependencies: { "foo-3": "3.0.0", "foo-4": "4.0.0" },
-        "npm-file-link": {
-          original_versions: {
-            "foo-package-3-name": "3.0.0"
-          }
-        }
-      });
-    });
   });
 
   describe("local method", () => {
@@ -73,7 +39,7 @@ describe("link", () => {
       workingPathStub.restore();
       sandbox.stub(process, "cwd").returns(path.resolve(__dirname, "fixtures", "foo-package-1"));
       expect.assertions(2);
-      await link.local();
+      await link.select();
 
       expect(writeStub.getCall(0).args[0]).toEqual("foo-package-1");
       expect(writeStub.getCall(0).args[1]).toEqual({
@@ -96,7 +62,7 @@ describe("link", () => {
         .stub(process, "cwd")
         .returns(path.resolve(__dirname, "linked-fixtures", "foo-linked-package"));
       expect.assertions(1);
-      await link.local();
+      await link.select();
 
       expect(chooseStub.getCall(0).args[0]["foo-package-1-name-2"].isLinked).toEqual(true);
     });

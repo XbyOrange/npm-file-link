@@ -3,7 +3,6 @@
 const path = require("path");
 
 const fsExtra = require("fs-extra");
-const chalk = require("chalk");
 
 const { FILE_DEPENDENCY, PACKAGEJSON_NAMESPACE } = require("./utils/helpers");
 const { PACKAGE_LOCK, PACKAGE_JSON } = require("./utils/paths");
@@ -32,8 +31,9 @@ const avoidFileLinks = () =>
     readPackageJsonAsJson().then(packageInfo => Promise.resolve(!hasOriginalVersions(packageInfo)))
   ]).then(results => {
     if (results.includes(false)) {
-      console.log(chalk.red('\nERROR: Please remove file links. Run "file-unlink-all".\n'));
-      process.exit(1);
+      return Promise.reject(
+        new Error('File links found. Please run "npm-file-link -ua" to remove all links')
+      );
     }
   });
 

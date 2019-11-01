@@ -23,37 +23,51 @@ npm i @xbyorange/npm-file-link -g
 Inside any package folder you can run:
 
 ```bash
-file-link
+npm-file-link
 ```
 
-The tool will find dependencies able to be linked because are cloned locally too, and will let you choose which ones to link using a CLI:
+The tool will find dependencies able to be linked because are cloned locally too in the same folder level, and will let you choose which ones to link using a CLI:
 
 ![Choose package screenshot](assets/choose-screenshot.png)
 
-Once you have chosen the dependencies to link, it will replace them locally by the correspondent `file:..` dependency in the current package and will run an `npm i` automatically. (Previous defined versions of the dependencies will be stores into a `.npm-file-link` file automatically generated in the repository, and will be restored when the `file-unlink` command is executed)
+Once you have chosen the dependencies to link, it will replace them locally by the correspondent `file:..` dependency in the current package and will run an `npm i` automatically. (Previous defined versions of the dependencies will be stored into a property in the `package.json` file automatically, and will be restored when the package is unlinked)
 
 To remove all links in the current package, restore dependencies to their original versions, and reinstall them:
 
 ```bash
-file-unlink
+npm-file-link -ua
 ```
 
 ### Linking all packages
 
-Inside any package folder, or in the parent folder you can run:
+Inside any package folder you can run:
 
 ```bash
-file-link-all
+npm-file-link -a
 ```
 
-This command will replace all packages inter-dependencies by the correspondent `file:..` dependency, so they will be effectively linked after executing `npm i` in each package folder.
-
-Unlink all packages:
+### Unlinking all packages:
 
 ```bash
-file-unlink-all
+npm-file-link --unlink --all
 ```
 
+...or:
+
+```bash
+npm-file-link -ua
+```
+
+### Options
+
+| Option | Alias | Description |
+| --- | --- | --- |
+| --check | -c | Throw an error if there are locally linked packages |
+| --all | -a | Apply command to all locally found dependencies. Do not prompt |
+| --unlink | -u | Unlink packages. Has to be used with the -a option |
+| --help | -h |  Display help |
+| --version | -v | Output the current version | 
+ 
 ### Caveats
 
 Linked packages have have modifications in the `package.json` and in the `package-lock.json` file that should never be pushed to the remote repository.
@@ -61,13 +75,13 @@ Linked packages have have modifications in the `package.json` and in the `packag
 **Before pushing any change, you must execute:**
 
 ```bash
-file-unlink-all
+npm-file-link -ua
 ```
 
 To avoid pushing local links to the remote repository, this package provides a `check` command that should be executed as a precommit hook.
 
 ```bash
-avoid-file-links
+npm-file-link --check
 ```
 
 ### Support (OS Terminals)

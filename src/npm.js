@@ -18,7 +18,7 @@ const removeNodeModules = () => {
 };
 
 const install = retrying => {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     console.log("Reinstalling npm dependencies...");
     const installProcess = childProcess.spawn("npm", ["i"], {
       windowsHide: true,
@@ -37,11 +37,17 @@ const install = retrying => {
 
     installProcess.on("close", code => {
       if (code !== 0) {
-        console.log(chalk.red("Error installing dependencies"));
         if (!retrying) {
-          return removeNodeModules().then(() => install(true));
+          return removeNodeModules()
+            .then(() => install(true))
+            .then(() => {
+              resolve();
+            })
+            .catch(err => {
+              reject(err);
+            });
         } else {
-          process.exit(1);
+          reject(new Error("Error installing dependencies"));
         }
       } else {
         resolve();
@@ -50,6 +56,15 @@ const install = retrying => {
   });
 };
 
+const checkChangesAndInstall = modified => {
+  if (modified > 0) {
+    return install();
+  }
+  console.log(chalk.green("No changes detected. Skipping install."));
+  return Promise.resolve();
+};
+
 module.exports = {
-  install
+  install,
+  checkChangesAndInstall
 };

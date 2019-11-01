@@ -75,33 +75,17 @@ const removePackagesLinks = (packageInfo, allPackages) => {
     .then(() => Promise.resolve(totalModified));
 };
 
-const removeAllPackagesLinks = allPackages => {
-  const packagesModifications = [];
-  Object.keys(allPackages).forEach(packageName => {
-    packagesModifications.push(removePackagesLinks(allPackages[packageName], allPackages));
-  });
-  return Promise.all(packagesModifications);
-};
-
 const all = () => {
-  return packages.readAll().then(removeAllPackagesLinks);
-};
-
-const local = () => {
-  return Promise.all([packages.readCurrent(), packages.readAll()])
-    .then(results => removePackagesLinks(results[0], results[1]))
-    .then(totalModified => {
-      if (totalModified > 0) {
-        return npm.install();
-      } else {
-        console.log(chalk.green("No changes detected. Skipping install."));
-        return Promise.resolve();
-      }
+  return packages.readCurrent().then(currentPackageInfo => {
+    return packages.currentLinkablePackages(currentPackageInfo).then(linkablePackages => {
+      return removePackagesLinks(currentPackageInfo, linkablePackages).then(removed => {
+        return npm.checkChangesAndInstall(removed);
+      });
     });
+  });
 };
 
 module.exports = {
   removePackagesLinks,
-  all,
-  local
+  all
 };

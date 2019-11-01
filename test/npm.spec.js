@@ -73,12 +73,12 @@ describe("npm", () => {
       expect(console.log.getCall(2).args[0]).toEqual("foo-error");
     });
 
-    it("should remove node_modules and retry npm install when returns an error", () => {
+    it("should remove node_modules and retry npm install when returns an error", async () => {
       expect.assertions(1);
       npm.install();
       closeCallback(1);
 
-      return new Promise(resolve => {
+      await new Promise(resolve => {
         setTimeout(() => {
           closeCallback(0);
           expect(fsExtra.remove.getCall(0).args[0]).toEqual(
@@ -89,17 +89,19 @@ describe("npm", () => {
       });
     });
 
-    it("should exit process when retry fails", () => {
+    it("should reject when retry fails", async () => {
       expect.assertions(1);
-      npm.install();
-      closeCallback(1);
 
-      return new Promise(resolve => {
-        setTimeout(() => {
-          closeCallback(1);
-          expect(process.exit.getCall(0).args[0]).toEqual(1);
+      setTimeout(() => {
+        closeCallback(1);
+      }, 200);
+
+      await new Promise(resolve => {
+        npm.install().catch(err => {
+          expect(err.message).toEqual("Error installing dependencies");
           resolve();
-        }, 200);
+        });
+        closeCallback(1);
       });
     });
   });
