@@ -35,7 +35,7 @@
     "lint": "eslint src test",
     "lint-staged": "lint-staged",
     "test": "jest",
-    "test-ci": "npm run test -- --coverage --ci --verbose=false --coverageReporters=lcov --coverageReporters=text-summary"
+    "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
   "dependencies": {
     "chalk": "^2.4.2",
