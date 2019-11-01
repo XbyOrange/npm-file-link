@@ -65,6 +65,5 @@ const checkChangesAndInstall = modified => {
 };
 
 module.exports = {
-  install,
   checkChangesAndInstall
 };

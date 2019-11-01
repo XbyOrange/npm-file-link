@@ -50,10 +50,18 @@ describe("npm", () => {
     sandbox.restore();
   });
 
-  describe("install method", () => {
-    it("should call to npm install", async () => {
+  describe("checkChangesAndInstall method", () => {
+    it("should not call to npm install if there are no modifications", async () => {
+      expect.assertions(1);
+      const install = npm.checkChangesAndInstall(0);
+
+      await install;
+      expect(childProcess.spawn.callCount).toEqual(0);
+    });
+
+    it("should call to npm install if there are modifications", async () => {
       expect.assertions(2);
-      const install = npm.install();
+      const install = npm.checkChangesAndInstall(1);
       closeCallback(0);
 
       await install;
@@ -63,7 +71,7 @@ describe("npm", () => {
 
     it("should log npm install logs", async () => {
       expect.assertions(2);
-      const install = npm.install();
+      const install = npm.checkChangesAndInstall(1);
       dataCallback("foo");
       errorCallback("foo-error");
       closeCallback(0);
@@ -75,7 +83,7 @@ describe("npm", () => {
 
     it("should remove node_modules and retry npm install when returns an error", async () => {
       expect.assertions(1);
-      npm.install();
+      npm.checkChangesAndInstall(1);
       closeCallback(1);
 
       await new Promise(resolve => {
@@ -97,7 +105,7 @@ describe("npm", () => {
       }, 200);
 
       await new Promise(resolve => {
-        npm.install().catch(err => {
+        npm.checkChangesAndInstall(1).catch(err => {
           expect(err.message).toEqual("Error installing dependencies");
           resolve();
         });
