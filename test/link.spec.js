@@ -1,8 +1,8 @@
 const path = require("path");
 
 const sinon = require("sinon");
+const fsExtra = require("fs-extra");
 
-const paths = require("../src/utils/paths");
 const packages = require("../src/utils/packages");
 const link = require("../src/link");
 const inquire = require("../src/inquire");
@@ -11,15 +11,11 @@ const npm = require("../src/npm");
 describe("link", () => {
   let sandbox;
   let writeStub;
-  let workingPathStub;
   let chooseStub;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     writeStub = sandbox.stub(packages, "writePackageJson").resolves();
-    workingPathStub = sandbox
-      .stub(paths, "getWorkingPath")
-      .resolves(path.resolve(__dirname, "fixtures"));
     chooseStub = sandbox.stub(inquire, "choose").callsFake(allPackages => {
       return Promise.resolve({
         toLink: allPackages,
@@ -35,8 +31,16 @@ describe("link", () => {
   });
 
   describe("all method", () => {
+    it("should reject if no package.json file is found in current folder", async () => {
+      sandbox.stub(fsExtra, "readJson").rejects(new Error());
+      sandbox.stub(process, "cwd").returns(path.resolve(__dirname, "fixtures", "foo-package-1"));
+      expect.assertions(1);
+      await link.all().catch(err => {
+        expect(err.message).toEqual(expect.stringContaining("Unable to read"));
+      });
+    });
+
     it("should link all locally found dependencies in current package", async () => {
-      workingPathStub.restore();
       sandbox.stub(process, "cwd").returns(path.resolve(__dirname, "fixtures", "foo-package-1"));
       expect.assertions(2);
       await link.all();
@@ -57,7 +61,6 @@ describe("link", () => {
     });
 
     it("should link all locally found dependencies in current package", async () => {
-      workingPathStub.restore();
       sandbox.stub(process, "cwd").returns(path.resolve(__dirname, "fixtures", "foo-only-dev"));
       expect.assertions(2);
       await link.all();
@@ -76,7 +79,6 @@ describe("link", () => {
     });
 
     it("should link all locally found devDependencies in current package", async () => {
-      workingPathStub.restore();
       sandbox.stub(process, "cwd").returns(path.resolve(__dirname, "fixtures", "foo-only-deps"));
       expect.assertions(2);
       await link.all();
@@ -97,7 +99,6 @@ describe("link", () => {
 
   describe("select method", () => {
     it("should modify selected dependencies in current package", async () => {
-      workingPathStub.restore();
       sandbox.stub(process, "cwd").returns(path.resolve(__dirname, "fixtures", "foo-package-1"));
       expect.assertions(2);
       chooseStub.callsFake(() => {
@@ -147,7 +148,6 @@ describe("link", () => {
     });
 
     it("should show checked currently linked packages", async () => {
-      workingPathStub.restore();
       sandbox
         .stub(process, "cwd")
         .returns(path.resolve(__dirname, "linked-fixtures", "foo-linked-package"));
