@@ -1,0 +1,7 @@
+{
+  "name": "foo-only-dev",
+  "version": "1.0.0",
+  "devDependencies": {
+    "foo-package-1-name": "1.1.1"
+  }
+}

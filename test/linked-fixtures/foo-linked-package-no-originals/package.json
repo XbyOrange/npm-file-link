@@ -1,0 +1,10 @@
+{
+  "name": "foo-linked-package-no-originals",
+  "version": "1.0.0",
+  "dependencies": {
+    "foo-only-deps-2": "file:../foo-only-dev"
+  },
+  "devDependencies": {
+    "foo-package-1-name-2": "file:../foo-package-1"
+  }
+}

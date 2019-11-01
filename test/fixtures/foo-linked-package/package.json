@@ -1,0 +1,7 @@
+{
+  "name": "foo-linked-package-name",
+  "version": "1.0.0",
+  "dependencies": {
+    "foo-package-1-name": "file:../foo-package-1"
+  }
+}
