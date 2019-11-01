@@ -160,7 +160,7 @@ describe("packages", () => {
       await packages.writePackageJson(fooFolder, fooPackage);
       const writeCall = fsExtra.writeJson.getCall(0);
       expect(writeCall.args[0]).toEqual(
-        expect.stringContaining("fixtures/foo-folder/package.json")
+        expect.stringContaining(["fixtures", "foo-folder", "package.json"].join(path.sep))
       );
       expect(writeCall.args[1]).toEqual(fooPackage);
     });

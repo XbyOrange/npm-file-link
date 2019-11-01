@@ -27,7 +27,7 @@ const packagesToMap = packagesInfo => {
   return packagesMap;
 };
 
-const packageFolder = packageJsonPath => packageJsonPath.split(path.sep)[0];
+const packageFolder = packageJsonPath => packageJsonPath.split("/")[0];
 
 const readAll = () => {
   return paths.getWorkingPath().then(workingPath => {

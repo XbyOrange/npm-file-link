@@ -22,6 +22,7 @@ const install = retrying => {
     console.log("Reinstalling npm dependencies...");
     const installProcess = childProcess.spawn("npm", ["i"], {
       windowsHide: true,
+      shell: true,
       env: {
         ...process.env,
         FORCE_COLOR: true
