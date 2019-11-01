@@ -32,6 +32,7 @@ const runAndCatch = () => {
   return run().catch(err => {
     console.log(chalk.red(`\nERROR: ${err.message}.\n`));
     process.exitCode = 1;
+    return Promise.resolve();
   });
 };
 
