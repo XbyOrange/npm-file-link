@@ -7,7 +7,7 @@ const packages = require("../src/utils/packages");
 const npm = require("../src/npm");
 const unlink = require("../src/unlink");
 
-describe.skip("unlink", () => {
+describe("unlink", () => {
   let sandbox;
   let writeStub;
   let workingPathStub;
@@ -17,22 +17,24 @@ describe.skip("unlink", () => {
     writeStub = sandbox.stub(packages, "writePackageJson").resolves();
     workingPathStub = sandbox
       .stub(paths, "getWorkingPath")
-      .resolves(path.resolve(__dirname, "linked-fixtures"));
-    sandbox.stub(npm, "checkPackagesAndInstall").resolves();
+      .resolves(path.resolve(__dirname, "fixtures"));
+
+    sandbox.stub(npm, "checkChangesAndInstall").resolves();
   });
 
   afterEach(() => {
     sandbox.restore();
   });
 
-  describe("local method", () => {
-    it("should modify all inter dependencies of found packages in current package", async () => {
+  describe("all method", () => {
+    it("should unlink all locally found dependencies in current package", async () => {
+      expect.assertions(2);
       workingPathStub.restore();
       sandbox
         .stub(process, "cwd")
         .returns(path.resolve(__dirname, "linked-fixtures", "foo-linked-package"));
       expect.assertions(2);
-      await unlink.local();
+      await unlink.all();
 
       expect(writeStub.getCall(0).args[0]).toEqual("foo-linked-package");
       expect(writeStub.getCall(0).args[1]).toEqual({
@@ -44,13 +46,33 @@ describe.skip("unlink", () => {
       });
     });
 
-    it("should restore dependencies to local versions if no original versions are found", async () => {
+    it("should unlink all locally found devDependencies in current package", async () => {
+      expect.assertions(2);
+      workingPathStub.restore();
+      sandbox
+        .stub(process, "cwd")
+        .returns(path.resolve(__dirname, "linked-fixtures", "foo-only-deps"));
+      expect.assertions(2);
+      await unlink.all();
+
+      expect(writeStub.getCall(0).args[0]).toEqual("foo-only-deps");
+      expect(writeStub.getCall(0).args[1]).toEqual({
+        name: "foo-only-dev-2",
+        version: "1.0.0",
+        devDependencies: {
+          "foo-package-1-name-2": "1.0.0"
+        }
+      });
+    });
+
+    it("should assign packages versions if no previous versions are stored in package.json", async () => {
+      expect.assertions(2);
       workingPathStub.restore();
       sandbox
         .stub(process, "cwd")
         .returns(path.resolve(__dirname, "linked-fixtures", "foo-linked-package-no-originals"));
       expect.assertions(2);
-      await unlink.local();
+      await unlink.all();
 
       expect(writeStub.getCall(0).args[0]).toEqual("foo-linked-package-no-originals");
       expect(writeStub.getCall(0).args[1]).toEqual({
@@ -63,28 +85,6 @@ describe.skip("unlink", () => {
           "foo-package-1-name-2": "1.0.0"
         }
       });
-    });
-
-    it("should call to npm i when changes are detected", async () => {
-      workingPathStub.restore();
-      sandbox
-        .stub(process, "cwd")
-        .returns(path.resolve(__dirname, "linked-fixtures", "foo-linked-package"));
-      expect.assertions(1);
-      await unlink.local();
-
-      expect(npm.install.callCount).toEqual(1);
-    });
-
-    it("should not call to npm i when no changes are detected", async () => {
-      workingPathStub.restore();
-      sandbox
-        .stub(process, "cwd")
-        .returns(path.resolve(__dirname, "linked-fixtures", "foo-package-1"));
-      expect.assertions(1);
-      await unlink.local();
-
-      expect(npm.install.callCount).toEqual(0);
     });
   });
 });
